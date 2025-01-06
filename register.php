@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-    $sql = "INSERT INTO patient (username, email, password) VALUES ('$username', '$email', '$hashed_password')";
+    $sql = "INSERT INTO doctor (username, email, password) VALUES ('$username', '$email', '$hashed_password')";
 
     if ($conn->query($sql) === TRUE) {
         echo json_encode(["message" => "Contul a fost creat cu succes!"]);

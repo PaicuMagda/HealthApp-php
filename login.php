@@ -26,14 +26,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $username = $conn->real_escape_string($data['username']);
         $password = $data['password'];
 
-        $sql = "SELECT * FROM patient WHERE username = '$username'";
+        $sql = "SELECT * FROM doctor WHERE username = '$username'";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
 
             if (password_verify($password, $row['password'])) {
-                echo json_encode(["success" => true, "user_id" => $row['id']]);
+                unset($row['password']); // Îndepărtează parola din obiectul returnat
+                echo json_encode(["success" => true, "user" => $row]);
             } else {
                 echo json_encode(["success" => false, "message" => "Parolă incorectă"]);
             }
