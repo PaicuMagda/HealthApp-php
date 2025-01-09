@@ -16,29 +16,25 @@ if ($conn->connect_error) {
     exit;
 }
 
-$input = file_get_contents("php://input");
-$data = json_decode($input, true);
+if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+    $id = $_GET['id'] ?? null;
 
-if (isset($data['id'])) {
-    $id = $conn->real_escape_string($data['id']);
+    if ($id) {
+        $stmt = $conn->prepare("DELETE FROM pacient WHERE id = ?");
+        $stmt->bind_param("s", $id);
 
-    $sql_check = "SELECT * FROM pacient WHERE id = '$id'";
-    $result_check = $conn->query($sql_check);
-
-    if ($result_check->num_rows > 0) {
-        $sql_delete = "DELETE FROM pacient WHERE id = '$id'";
-
-        if ($conn->query($sql_delete) === TRUE) {
-            echo json_encode(["success" => true, "message" => "Pacientul a fost șters."]);
+        if ($stmt->execute()) {
+            echo json_encode(["success" => true, "message" => "Pacient șters cu succes."]);
         } else {
-            echo json_encode(["error" => "Eroare la ștergere: " . $conn->error]);
+            echo json_encode(["success" => false, "message" => "Eroare la ștergerea pacientului."]);
         }
+
+        $stmt->close();
     } else {
-        echo json_encode(["error" => "Pacientul nu a fost găsit."]);
+        echo json_encode(["success" => false, "message" => "ID-ul pacientului lipsește."]);
     }
-} else {
-    echo json_encode(["error" => "ID pacient invalid."]);
 }
+
 
 $conn->close();
 ?>

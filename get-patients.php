@@ -14,7 +14,7 @@ if ($conn->connect_error) {
     exit;
 }
 
-$sql = "SELECT id, doctor_id, nume, prenume, adresa, locatie, data_nasterii, gen, cnp, email, varsta, greutate, inaltime, ocupatie, poza FROM pacient";
+$sql = "SELECT id, doctor_id, nume, prenume,  locatie, data_nasterii, gen, cnp, email, varsta, greutate, inaltime, ocupatie, strada, numar, poza FROM pacient";
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {

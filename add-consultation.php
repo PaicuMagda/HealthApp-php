@@ -1,44 +1,51 @@
 <?php
-// Setările pentru conexiunea la baza de date
+header("Content-Type: application/json");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "healthapp";
 
-// Crează conexiunea
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Verifică conexiunea
 if ($conn->connect_error) {
-    die("Conexiune eșuată: " . $conn->connect_error);
+    echo json_encode(["error" => "Conexiune eșuată: " . $conn->connect_error]);
+    exit;
 }
 
-// Verifică dacă datele au fost trimise prin metoda POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Obține datele trimise de la utilizator
-    $cnp = $_POST['cnp'];  // CNP-ul pacientului
-    $data_consultatie = $_POST['data_consultatie'];  // Data consultatiei
-    $diagnostic = $_POST['diagnostic'];  // Diagnosticul
-    $medicamentatie = $_POST['medicamentatie'];  // Medicamentatia
+$data = json_decode(file_get_contents("php://input"), true);
+$cnp = $data['cnp'] ?? null;
+$data_consultatie = $data['data_consultatie'] ?? null;
+$diagnostic = $data['diagnostic'] ?? null;
+$medicamentatie = $data['medicamentatie'] ?? null;
 
-    // Verifică dacă toate câmpurile sunt completate
-    if (empty($cnp) || empty($data_consultatie) || empty($diagnostic) || empty($medicamentatie)) {
-        echo json_encode(["error" => "Toate câmpurile sunt obligatorii."]);
-        exit;
-    }
-
-    // Pregătește interogarea SQL pentru a insera datele în tabela `consultatie`
-    $sql = "INSERT INTO consultatie (cnp, data_consultatie, diagnostic, medicamentatie) 
-            VALUES ('$cnp', '$data_consultatie', '$diagnostic', '$medicamentatie')";
-
-    // Execută interogarea
-    if ($conn->query($sql) === TRUE) {
-        echo json_encode(["success" => "Consultația a fost adăugată cu succes."]);
-    } else {
-        echo json_encode(["error" => "Eroare la adăugarea consultației: " . $conn->error]);
-    }
+if (!$cnp || !$data_consultatie || !$diagnostic || !$medicamentatie) {
+    echo json_encode(["success" => false, "message" => "Toate câmpurile sunt necesare."]);
+    exit;
 }
 
-// Închide conexiunea
+$sql_last_nr = "SELECT COALESCE(MAX(nr_consultatie), 0) AS last_nr FROM consultatie WHERE cnp = ?";
+$stmt = $conn->prepare($sql_last_nr);
+$stmt->bind_param("s", $cnp);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$last_nr = $row['last_nr'];
+$new_nr_consultatie = $last_nr + 1;
+
+$sql_insert = "INSERT INTO consultatie (cnp, nr_consultatie, data_consultatie, diagnostic, medicamentatie) VALUES (?, ?, ?, ?, ?)";
+$stmt = $conn->prepare($sql_insert);
+$stmt->bind_param("sisss", $cnp, $new_nr_consultatie, $data_consultatie, $diagnostic, $medicamentatie);
+
+if ($stmt->execute()) {
+    echo json_encode(["success" => true, "message" => "Consultație adăugată cu succes."]);
+} else {
+    echo json_encode(["success" => false, "message" => "Eroare la adăugarea consultației."]);
+}
+
+$stmt->close();
 $conn->close();
 ?>
