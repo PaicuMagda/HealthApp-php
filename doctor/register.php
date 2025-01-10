@@ -14,7 +14,6 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $input = file_get_contents("php://input");
@@ -23,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $data['username'] ?? null;
     $email = $data['email'] ?? null;
     $password = $data['password'] ?? null;
+    $role = $data['role'] ?? 'doctor';
 
     if (!$username || !$email || !$password) {
         echo json_encode(["error" => "Toate câmpurile sunt obligatorii!"]);
@@ -35,7 +35,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-    $sql = "INSERT INTO doctor (username, email, password) VALUES ('$username', '$email', '$hashed_password')";
+    $checkEmailSql = "SELECT * FROM doctor WHERE email = '$email'";
+    $result = $conn->query($checkEmailSql);
+
+    if ($result->num_rows > 0) {
+        echo json_encode(["error" => "Acest email este deja utilizat!"]);
+        exit;
+    }
+
+    $sql = "INSERT INTO doctor (username, email, password, role) VALUES ('$username', '$email', '$hashed_password', '$role')";
 
     if ($conn->query($sql) === TRUE) {
         echo json_encode(["message" => "Contul a fost creat cu succes!"]);
@@ -47,4 +55,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $conn->close();
-?>

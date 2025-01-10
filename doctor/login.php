@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $row = $result->fetch_assoc();
 
             if (password_verify($password, $row['password'])) {
-                unset($row['password']); // Îndepărtează parola din obiectul returnat
+                unset($row['password']);
                 echo json_encode(["success" => true, "user" => $row]);
             } else {
                 echo json_encode(["success" => false, "message" => "Parolă incorectă"]);
