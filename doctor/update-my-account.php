@@ -21,18 +21,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     $input = file_get_contents("php://input");
     $data = json_decode($input, true);
 
-    // Verificăm dacă datele necesare sunt furnizate
-    if (isset($data['id'], $data['nume'], $data['specializare'], $data['email'], $data['cnp'], $data['prenume'])) {
+
+    if (isset($data['id'], $data['nume'], $data['specializare'], $data['email'], $data['cnp'], $data['prenume'], $data['username'])) {
         $id = $data['id'];
         $nume = $data['nume'];
         $specializare = $data['specializare'];
         $email = $data['email'];
         $cnp = $data['cnp'];
         $prenume = $data['prenume'];
+        $username = $data['username'];
 
-        $stmt = $conn->prepare("UPDATE doctor SET nume = ?, specializare = ?, email = ? WHERE id = ?");
+        $stmt = $conn->prepare("UPDATE doctor SET nume = ?, username = ?, prenume = ?, cnp = ?, specializare = ?, email = ? WHERE id = ?");
         if ($stmt) {
-            $stmt->bind_param("sssi", $nume, $specializare, $email, $id);
+
+            $stmt->bind_param("ssssssi", $nume, $username, $prenume, $cnp, $specializare, $email, $id);
 
             if ($stmt->execute()) {
                 echo json_encode(["success" => true, "message" => "Datele au fost actualizate."]);
@@ -52,3 +54,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 }
 
 $conn->close();
+?>

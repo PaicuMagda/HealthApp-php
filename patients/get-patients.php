@@ -1,6 +1,9 @@
 <?php
+
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
 $servername = "localhost";
 $username = "root";
@@ -14,18 +17,45 @@ if ($conn->connect_error) {
     exit;
 }
 
-$sql = "SELECT id, doctor_id, nume, prenume,  locatie, data_nasterii, gen, cnp, email, varsta, greutate, inaltime, ocupatie, strada, numar, poza FROM patient";
-$result = $conn->query($sql);
+function getAllPatientsWithConsultations($conn)
+{
+    $sql = "SELECT id, doctor_id, nume, prenume, locatie, data_nasterii, gen, cnp, email, varsta, greutate, inaltime, ocupatie, strada, numar, poza 
+            FROM pacient";
 
-if ($result->num_rows > 0) {
-    $patients = [];
-    while ($row = $result->fetch_assoc()) {
-        $patients[] = $row;
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        $patients = [];
+        while ($row = $result->fetch_assoc()) {
+            $patient = $row;
+            $cnp_patient = $row['cnp'];
+
+            $sql_consultations = "SELECT nr_consultatie, data_consultatie, diagnostic, medicamentatie 
+                                  FROM consultatie 
+                                  WHERE cnp = '$cnp_patient'";
+            $consultations_result = $conn->query($sql_consultations);
+
+            if ($consultations_result->num_rows > 0) {
+                $consultations = [];
+                while ($consultation = $consultations_result->fetch_assoc()) {
+                    $consultations[] = $consultation;
+                }
+                $patient['consultations'] = $consultations;
+            } else {
+                $patient['consultations'] = [];
+            }
+
+            $patients[] = $patient;
+        }
+        return $patients;
+    } else {
+        return ["message" => "Nu există pacienți disponibili"];
     }
-    echo json_encode($patients);
-} else {
-    echo json_encode(["message" => "Nu există pacienți"]);
 }
 
+$patients = getAllPatientsWithConsultations($conn);
+echo json_encode($patients);
+
 $conn->close();
+
 ?>
