@@ -7,7 +7,7 @@ header("Access-Control-Allow-Headers: Content-Type, Authorization");
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "healthapp";
+$dbname = "healthcare";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -27,18 +27,23 @@ if (!$cnp || !$data_consultatie || !$diagnostic || !$medicamentatie) {
     exit;
 }
 
-$sql_last_nr = "SELECT COALESCE(MAX(nr_consultatie), 0) AS last_nr FROM consultatie WHERE cnp = ?";
-$stmt = $conn->prepare($sql_last_nr);
+// Verifică dacă pacientul există în tabela `patient`
+$sql_check_patient = "SELECT cnp FROM pacient WHERE cnp = ?";
+$stmt = $conn->prepare($sql_check_patient);
 $stmt->bind_param("s", $cnp);
 $stmt->execute();
 $result = $stmt->get_result();
-$row = $result->fetch_assoc();
-$last_nr = $row['last_nr'];
-$new_nr_consultatie = $last_nr + 1;
 
-$sql_insert = "INSERT INTO consultatie (cnp, nr_consultatie, data_consultatie, diagnostic, medicamentatie) VALUES (?, ?, ?, ?, ?)";
+if ($result->num_rows == 0) {
+    // Dacă pacientul nu există
+    echo json_encode(["success" => false, "message" => "Pacientul cu acest CNP nu există în baza de date."]);
+    exit;
+}
+
+// Inserare consultație
+$sql_insert = "INSERT INTO consultatie (cnp, data_consultatie, diagnostic, medicamentatie) VALUES (?, ?, ?, ?)";
 $stmt = $conn->prepare($sql_insert);
-$stmt->bind_param("sisss", $cnp, $new_nr_consultatie, $data_consultatie, $diagnostic, $medicamentatie);
+$stmt->bind_param("ssss", $cnp, $data_consultatie, $diagnostic, $medicamentatie);
 
 if ($stmt->execute()) {
     echo json_encode(["success" => true, "message" => "Consultație adăugată cu succes."]);

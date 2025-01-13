@@ -8,7 +8,7 @@ header("Access-Control-Allow-Headers: Content-Type");
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "healthapp";
+$dbname = "healthcare";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 

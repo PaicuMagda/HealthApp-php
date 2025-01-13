@@ -7,7 +7,7 @@ header("Access-Control-Allow-Headers: Content-Type");
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "healthapp";
+$dbname = "healthcare";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -36,7 +36,7 @@ if (isset($data['id'], $data['nume'], $data['prenume'], $data['cnp'])) {
     $ocupatie = isset($data['ocupatie']) ? $conn->real_escape_string($data['ocupatie']) : NULL;
     $poza = isset($data['poza']) ? $conn->real_escape_string($data['poza']) : NULL;
 
-    $sql = "UPDATE patients SET 
+    $sql = "UPDATE patient SET 
             doctor_id = '$doctor_id',
             nume = '$nume',
             prenume = '$prenume',

@@ -1,8 +1,12 @@
 <?php
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE, PUT");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "healthapp";
+$dbname = "healthcare";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 

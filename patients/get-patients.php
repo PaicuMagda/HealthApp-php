@@ -5,7 +5,7 @@ header("Access-Control-Allow-Origin: *");
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "healthapp";
+$dbname = "healthcare";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -14,7 +14,7 @@ if ($conn->connect_error) {
     exit;
 }
 
-$sql = "SELECT id, doctor_id, nume, prenume,  locatie, data_nasterii, gen, cnp, email, varsta, greutate, inaltime, ocupatie, strada, numar, poza FROM pacient";
+$sql = "SELECT id, doctor_id, nume, prenume,  locatie, data_nasterii, gen, cnp, email, varsta, greutate, inaltime, ocupatie, strada, numar, poza FROM patient";
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
