@@ -17,7 +17,6 @@ if ($conn->connect_error) {
     exit;
 }
 
-// Afișare pacienți pentru un doctor
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'get_patients') {
 
     $doctor_id = $_GET['doctor_id'] ?? null;

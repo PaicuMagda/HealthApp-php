@@ -16,12 +16,11 @@ if ($conn->connect_error) {
     exit;
 }
 
-// Verifică dacă `doctor_id` este transmis ca parametru GET
 if (isset($_GET['doctor_id'])) {
-    $doctor_id = $conn->real_escape_string($_GET['doctor_id']); // Securizare împotriva SQL Injection
+    $doctor_id = $conn->real_escape_string($_GET['doctor_id']);
 
-    // Modifică interogarea pentru a selecta pacienții unui anumit doctor
-    $sql = "SELECT id, doctor_id, nume, prenume, locatie, data_nasterii, gen, cnp, email, varsta, greutate, inaltime, ocupatie, strada, numar, poza
+    $sql = "SELECT id, doctor_id, nume, prenume, data_nasterii, gen, cnp, email, varsta, greutate, inaltime, ocupatie, poza, judet, oras, 
+                   bloc, apartament, scara, etaj, cod_postal, telefon, rh, grupa_sanguina
             FROM pacient 
             WHERE doctor_id = '$doctor_id'";
 
@@ -33,22 +32,19 @@ if (isset($_GET['doctor_id'])) {
             $patient = $row;
             $cnp_patient = $row['cnp'];
 
-            // Aducem consultațiile pentru fiecare pacient
             $sql_consultations = "SELECT nr_consultatie, data_consultatie, diagnostic, medicamentatie 
                                   FROM consultatie 
-                                  WHERE cnp = '$cnp_patient'"; // Căutăm doar consultațiile care se potrivesc cu CNP-ul pacientului
+                                  WHERE cnp = '$cnp_patient'";
 
             $consultations_result = $conn->query($sql_consultations);
 
             if ($consultations_result->num_rows > 0) {
-                // Adăugăm consultațiile în array-ul pacientului
                 $consultations = [];
                 while ($consultation = $consultations_result->fetch_assoc()) {
                     $consultations[] = $consultation;
                 }
                 $patient['consultations'] = $consultations;
             } else {
-                // Dacă nu sunt consultații, setăm un array gol
                 $patient['consultations'] = [];
             }
 

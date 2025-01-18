@@ -19,7 +19,8 @@ if ($conn->connect_error) {
 
 function getAllPatientsWithConsultations($conn)
 {
-    $sql = "SELECT id, doctor_id, nume, prenume, locatie, data_nasterii, gen, cnp, email, varsta, greutate, inaltime, ocupatie, strada, numar, poza 
+    $sql = "SELECT id, doctor_id, nume, prenume, data_nasterii, gen, cnp, email, varsta,
+     greutate, inaltime, ocupatie, strada, numar, poza 
             FROM pacient";
 
     $result = $conn->query($sql);

@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     $data = json_decode($input, true);
 
 
-    if (isset($data['id'], $data['nume'], $data['specializare'], $data['email'], $data['cnp'], $data['prenume'], $data['username'])) {
+    if (isset($data['id'], $data['nume'], $data['specializare'], $data['email'], $data['cnp'], $data['prenume'], $data['username'], $data['cid'], $data['casa de asigurari'])) {
         $id = $data['id'];
         $nume = $data['nume'];
         $specializare = $data['specializare'];
@@ -30,8 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         $cnp = $data['cnp'];
         $prenume = $data['prenume'];
         $username = $data['username'];
+        $cid = $data['cid'];
+        $casa_de_asigurari = $data['casa de asigurari'];
 
-        $stmt = $conn->prepare("UPDATE doctor SET nume = ?, username = ?, prenume = ?, cnp = ?, specializare = ?, email = ? WHERE id = ?");
+        $stmt = $conn->prepare("UPDATE doctor SET nume = ?, username = ?, prenume = ?, cnp = ?, specializare = ?, email = ?, cid = ?, casa_de_asigurari = ? WHERE id = ?");
         if ($stmt) {
 
             $stmt->bind_param("ssssssi", $nume, $username, $prenume, $cnp, $specializare, $email, $id);
