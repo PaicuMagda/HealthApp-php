@@ -5,7 +5,6 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: PUT");
 header("Access-Control-Allow-Headers: Content-Type");
 
-// Conexiunea la baza de date
 $servername = "localhost";
 $username = "root";
 $password = "";

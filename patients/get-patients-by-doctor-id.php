@@ -19,8 +19,11 @@ if ($conn->connect_error) {
 if (isset($_GET['doctor_id'])) {
     $doctor_id = $conn->real_escape_string($_GET['doctor_id']);
 
-    $sql = "SELECT id, doctor_id, nume, prenume, data_nasterii, gen, cnp, email, varsta, greutate, inaltime, ocupatie, poza, judet, oras, 
-                   bloc, apartament, scara, etaj, cod_postal, telefon, rh, grupa_sanguina
+    $sql = "SELECT 
+                id, doctor_id, nume, prenume, data_nasterii, gen, cnp, email, varsta, greutate, 
+                inaltime, ocupatie, poza, strada, numar, judet, oras, bloc, apartament, scara, 
+                etaj, cod_postal, telefon, rh, grupa_sanguina, boli_cronice, vaccinari, boli_ereditare, 
+                dieta, activitate_fizica, fumat, consum_alcool, consum_droguri, boala
             FROM pacient 
             WHERE doctor_id = '$doctor_id'";
 
@@ -32,7 +35,9 @@ if (isset($_GET['doctor_id'])) {
             $patient = $row;
             $cnp_patient = $row['cnp'];
 
-            $sql_consultations = "SELECT nr_consultatie, data_consultatie, diagnostic, medicamentatie 
+            // Obține consultațiile asociate pacientului
+            $sql_consultations = "SELECT 
+                                    nr_consultatie, data_consultatie, diagnostic, medicamentatie 
                                   FROM consultatie 
                                   WHERE cnp = '$cnp_patient'";
 
@@ -52,7 +57,8 @@ if (isset($_GET['doctor_id'])) {
         }
         echo json_encode($patients);
     } else {
-        echo json_encode(["message" => "Nu există pacienți pentru acest doctor"]);
+
+        echo json_encode([]);
     }
 } else {
     echo json_encode(["error" => "Parametrul 'doctor_id' este obligatoriu"]);

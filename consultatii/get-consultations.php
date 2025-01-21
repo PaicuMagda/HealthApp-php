@@ -40,7 +40,6 @@ if (isset($_GET['cnp'])) {
             $consultatii[] = $row;
         }
 
-        // Răspuns corect JSON
         echo json_encode(["consultatii" => $consultatii]);
     } else {
         echo json_encode(["status" => "error", "message" => "Pacientul cu acest CNP nu există."]);

@@ -27,7 +27,6 @@ if (!$cnp || !$data_consultatie || !$diagnostic || !$medicamentatie) {
     exit;
 }
 
-// Verifică dacă pacientul există în tabela `patient`
 $sql_check_patient = "SELECT cnp FROM pacient WHERE cnp = ?";
 $stmt = $conn->prepare($sql_check_patient);
 $stmt->bind_param("s", $cnp);
@@ -35,12 +34,10 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows == 0) {
-    // Dacă pacientul nu există
     echo json_encode(["success" => false, "message" => "Pacientul cu acest CNP nu există în baza de date."]);
     exit;
 }
 
-// Inserare consultație
 $sql_insert = "INSERT INTO consultatie (cnp, data_consultatie, diagnostic, medicamentatie) VALUES (?, ?, ?, ?)";
 $stmt = $conn->prepare($sql_insert);
 $stmt->bind_param("ssss", $cnp, $data_consultatie, $diagnostic, $medicamentatie);
