@@ -35,7 +35,6 @@ if (isset($_GET['doctor_id'])) {
             $patient = $row;
             $cnp_patient = $row['cnp'];
 
-            // Obține consultațiile asociate pacientului
             $sql_consultations = "SELECT 
                                     nr_consultatie, data_consultatie, diagnostic, medicamentatie 
                                   FROM consultatie 
