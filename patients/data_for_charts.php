@@ -17,12 +17,16 @@ if ($conn->connect_error) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+
     $sql_specializare = "
-        SELECT d.specializare, COUNT(DISTINCT p.id) AS numar_pacienti
-        FROM Doctor d
-        JOIN Pacient p ON p.doctor_id = d.id
+        SELECT 
+            p.nume AS pacient_nume,
+            COUNT(DISTINCT d.specializare) AS numar_specializari
+        FROM Pacient p
         JOIN Consultatie c ON c.cnp = p.cnp
-        GROUP BY d.specializare
+        JOIN Doctor d ON d.specializare IS NOT NULL
+        GROUP BY p.cnp, p.nume
+        ORDER BY numar_specializari DESC
     ";
 
     $result_specializare = $conn->query($sql_specializare);
@@ -31,16 +35,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     if ($result_specializare->num_rows > 0) {
         while ($row = $result_specializare->fetch_assoc()) {
             $specializari[] = [
-                'specializare' => $row['specializare'],
-                'numar_pacienti' => $row['numar_pacienti']
+                'pacient_nume' => $row['pacient_nume'],
+                'numar_specializari' => $row['numar_specializari']
             ];
         }
     } else {
-        $specializari[] = ["message" => "Nu sunt pacienți pe specialități."];
+        $specializari[] = ["message" => "Nu sunt pacienți cu consultații la specializări multiple."];
     }
 
     $sql_boli = "
-        SELECT c.diagnostic, COUNT(DISTINCT p.id) AS numar_pacienti
+        SELECT c.diagnostic, COUNT(DISTINCT p.cnp) AS numar_pacienti
         FROM Consultatie c
         JOIN Pacient p ON c.cnp = p.cnp
         GROUP BY c.diagnostic

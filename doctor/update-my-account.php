@@ -21,8 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     $input = file_get_contents("php://input");
     $data = json_decode($input, true);
 
-
-    if (isset($data['id'], $data['nume'], $data['specializare'], $data['email'], $data['cnp'], $data['prenume'], $data['username'], $data['cid'], $data['casa de asigurari'])) {
+    if (isset($data['id'], $data['nume'], $data['specializare'], $data['email'], $data['cnp'], $data['prenume'], $data['username'])) {
         $id = $data['id'];
         $nume = $data['nume'];
         $specializare = $data['specializare'];
@@ -30,12 +29,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         $cnp = $data['cnp'];
         $prenume = $data['prenume'];
         $username = $data['username'];
-        $cid = $data['cid'];
-        $casa_de_asigurari = $data['casa de asigurari'];
 
-        $stmt = $conn->prepare("UPDATE doctor SET nume = ?, username = ?, prenume = ?, cnp = ?, specializare = ?, email = ?, cid = ?, casa_de_asigurari = ? WHERE id = ?");
+        $stmt = $conn->prepare("SELECT id FROM doctor WHERE email = ? AND id != ?");
         if ($stmt) {
+            $stmt->bind_param("si", $email, $id);
+            $stmt->execute();
+            $stmt->store_result();
 
+            if ($stmt->num_rows > 0) {
+                echo json_encode(["success" => false, "message" => "Email duplicat."]);
+                $stmt->close();
+                $conn->close();
+                exit;
+            }
+
+            $stmt->close();
+        } else {
+            echo json_encode(["success" => false, "message" => "Eroare la pregătirea cererii SQL: " . $conn->error]);
+            $conn->close();
+            exit;
+        }
+        $stmt = $conn->prepare("UPDATE doctor SET nume = ?, username = ?, prenume = ?, cnp = ?, specializare = ?, email = ? WHERE id = ?");
+        if ($stmt) {
             $stmt->bind_param("ssssssi", $nume, $username, $prenume, $cnp, $specializare, $email, $id);
 
             if ($stmt->execute()) {
